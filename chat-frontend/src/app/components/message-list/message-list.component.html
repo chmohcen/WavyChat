@@ -1,0 +1,42 @@
+<div class="messages-container" #messagesContainer>
+  <div class="messages">
+    <ng-container *ngFor="let message of messages; let i = index">
+      <!-- Timestamp divider for message groups -->
+      <div
+        *ngIf="getMessageGroupKey(message, messages[i - 1])"
+        class="message-divider"
+      >
+        <span>{{ message.timestamp | date: 'MMM d, HH:mm' }}</span>
+      </div>
+
+      <!-- Message bubble -->
+      <div
+        class="message"
+        [class.message--own]="message.isOwn"
+        [class.message--other]="!message.isOwn"
+      >
+        <div *ngIf="!message.isOwn" class="message__avatar">
+          <img [src]="message.sender.avatar" alt="Avatar">
+        </div>
+
+        <div class="message__content">
+          <div class="message__bubble">
+            <p class="message__text">{{ message.content }}</p>
+          </div>
+          <div class="message__meta">
+            <span class="message__time">{{ formatTime(message.timestamp) }}</span>
+            <span *ngIf="message.isOwn" class="message__status">
+              <svg *ngIf="message.isRead" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+                <polyline points="24 6 13 17 8 12"></polyline>
+              </svg>
+              <svg *ngIf="!message.isRead" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

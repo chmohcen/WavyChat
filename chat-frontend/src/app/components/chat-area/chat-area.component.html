@@ -1,0 +1,5 @@
+<div class="chat-area">
+  <app-chat-header [chat]="selectedChat$ | async"></app-chat-header>
+  <app-message-list [messages]="(messages$ | async) || []"></app-message-list>
+  <app-message-input (messageSent)="onMessageSent($event)"></app-message-input>
+</div>

@@ -1,0 +1,39 @@
+<div class="message-input-area">
+  <!-- Emoji Picker -->
+  <div class="emoji-picker" *ngIf="showEmojiPicker">
+    <emoji-mart style="width: 10px;" [darkMode]="false" (emojiClick)="addEmoji($event)"></emoji-mart>
+  </div>
+
+  <!-- Input Container -->
+  <div class="input-container">
+    <button
+      class="action-btn action-btn--emoji"
+      (click)="toggleEmojiPicker()"
+      type="button"
+      title="Add emoji"
+    >
+      🙂
+    </button>
+
+    <textarea
+      class="message-input"
+      placeholder="Type a message..."
+      [(ngModel)]="messageText"
+      (keypress)="onKeyPress($event)"
+      rows="1"
+    ></textarea>
+
+    <button
+      class="action-btn action-btn--send"
+      (click)="onSendMessage()"
+      (keypress)="onKeyPress($event)"
+      type="button"
+      [disabled]="!messageText.trim()"
+      title="Send message"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16 3L2 10l14 7 4-14z" />
+      </svg>
+    </button>
+  </div>
+</div>
