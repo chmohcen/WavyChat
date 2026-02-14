@@ -1,11 +1,12 @@
+
 # Compiled output
 /dist
 /tmp
 /out-tsc
 /bazel-out
-
+.nx
 # Node
-/node_modules
+node_modules
 npm-debug.log
 yarn-error.log
 
@@ -24,6 +25,7 @@ yarn-error.log
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/extensions.txt
 .history/*
 
 # Miscellaneous
@@ -38,3 +40,38 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__
+*.py[cod]
+*$py.class
+
+# vs code configuration folder
+.vscode
+.idea
+# Django logs and debug files:
+*.log
+TODO
+
+# data
+data
+
+notes.md
+
+# cache
+fsc
+# Frontend settings
+media
+front/webpack-stats.json
+backups
+debug.log
+angular_errors.log
+front_debug.log
+back_debug.log
+/socks
+celerybeat-schedule
+.venv
+.angular
+
