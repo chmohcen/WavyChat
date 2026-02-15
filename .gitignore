@@ -74,4 +74,5 @@ back_debug.log
 celerybeat-schedule
 .venv
 .angular
-
+migrations
+db.sqlite3
