@@ -4,3 +4,7 @@ runback:
 	cd chat_backend && python manage.py runserver
 mig:
 	cd chat_backend && python manage.py makemigrations && python manage.py migrate
+up:
+	docker compose up 
+down:
+	docker compose down
