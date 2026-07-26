@@ -54,3 +54,9 @@ class MessageSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'is_seen': {'read_only': True},
         }
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if request and attrs.get('receiver') == request.user:
+            raise serializers.ValidationError({'receiver': 'You cannot send a message to yourself.'})
+        return attrs

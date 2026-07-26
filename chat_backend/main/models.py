@@ -43,6 +43,14 @@ class Message(models.Model):
     is_seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(sender=models.F('receiver')),
+                name='message_sender_not_receiver',
+            ),
+        ]
+
     def __str__(self):
         return f"From {self.sender} to {self.receiver}: {self.text[:20]}"
 
