@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { User } from '../models/chat.model';
 import { environment } from '../../environments/environment';
+import { LAST_SELECTED_CHAT_ID_KEY } from './storage-keys';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,7 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
+    localStorage.removeItem(LAST_SELECTED_CHAT_ID_KEY);
   }
 
   signup(payload: {

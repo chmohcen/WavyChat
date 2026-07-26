@@ -22,10 +22,12 @@ import { Observable } from 'rxjs';
 export class ChatAreaComponent implements OnInit {
   selectedChat$: Observable<Chat | null>;
   messages$: Observable<Message[]>;
+  isLoadingMessages$: Observable<boolean>;
 
   constructor(private chatService: ChatService) {
     this.selectedChat$ = this.chatService.selectedChat$;
     this.messages$ = this.chatService.messages$;
+    this.isLoadingMessages$ = this.chatService.isLoadingMessages$;
   }
 
   ngOnInit(): void {}

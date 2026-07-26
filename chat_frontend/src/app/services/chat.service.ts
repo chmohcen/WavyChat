@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { User, Chat, Message } from '../models/chat.model';
 import { AuthService } from './auth.service';
 import { MessageService, ConversationDto, MessageDto } from './message.service';
+import { LAST_SELECTED_CHAT_ID_KEY } from './storage-keys';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,9 @@ export class ChatService {
   private isLoadingMoreChatsSubject = new BehaviorSubject<boolean>(false);
   isLoadingMoreChats$ = this.isLoadingMoreChatsSubject.asObservable();
 
+  private isLoadingMessagesSubject = new BehaviorSubject<boolean>(true);
+  isLoadingMessages$ = this.isLoadingMessagesSubject.asObservable();
+
   private readonly conversationsPageSize = 20;
   private conversationsOffset = 0;
   private isLoadingMoreChats = false;
@@ -39,9 +43,12 @@ export class ChatService {
 
   selectChat(chat: Chat): void {
     this.selectedChatSubject.next(chat);
+    this.isLoadingMessagesSubject.next(true);
+    localStorage.setItem(LAST_SELECTED_CHAT_ID_KEY, chat.id);
 
     this.messageService.getMessages(chat.participants[0].id).subscribe(dtos => {
       this.messagesSubject.next(dtos.map(dto => this.toMessage(dto, chat)));
+      this.isLoadingMessagesSubject.next(false);
     });
 
     this.markChatAsRead(chat.id);
@@ -122,7 +129,11 @@ export class ChatService {
       this.hasMoreChatsSubject.next(page.has_more);
 
       if (chats.length > 0 && !this.selectedChatSubject.value) {
-        this.selectChat(chats[0]);
+        const lastSelectedChatId = localStorage.getItem(LAST_SELECTED_CHAT_ID_KEY);
+        const chatToSelect = chats.find(chat => chat.id === lastSelectedChatId) ?? chats[0];
+        this.selectChat(chatToSelect);
+      } else {
+        this.isLoadingMessagesSubject.next(false);
       }
     });
   }

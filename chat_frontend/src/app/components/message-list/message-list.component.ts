@@ -17,6 +17,7 @@ import { Message } from '../../models/chat.model';
 })
 export class MessageListComponent implements OnInit {
   @Input() messages: Message[] = [];
+  @Input() isLoading = false;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   ngAfterViewInit() {
@@ -41,5 +42,15 @@ export class MessageListComponent implements OnInit {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
+  }
+
+  isNewDay(index: number): boolean {
+    if (index === 0) {
+      return true;
+    }
+
+    const current = this.messages[index].timestamp;
+    const previous = this.messages[index - 1].timestamp;
+    return current.toDateString() !== previous.toDateString();
   }
 }
