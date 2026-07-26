@@ -8,7 +8,6 @@ interface SettingsForm {
   name: string;
   email: string;
   password: string;
-  picture: string;
   status: User['status'];
 }
 
@@ -28,13 +27,7 @@ export class UserSettingsModalComponent implements OnChanges {
   selectedPictureFile: File | null = null;
   previewPictureUrl: string | null = null;
   private objectUrl: string | null = null;
-  settingsForm: SettingsForm = {
-    name: '',
-    email: '',
-    password: '',
-    picture: '',
-    status: 'online'
-  };
+  settingsForm: SettingsForm = this.toSettingsForm(null);
   statusOptions = [
     { value: 'online', label: 'Online' },
     { value: 'away', label: 'Away' },
@@ -50,9 +43,7 @@ export class UserSettingsModalComponent implements OnChanges {
   }
 
   close(): void {
-    this.revokePreviewObjectUrl();
-    this.selectedPictureFile = null;
-    this.previewPictureUrl = this.currentUser?.final_picture ?? null;
+    this.resetPictureSelection();
     this.closed.emit();
   }
 
@@ -67,9 +58,7 @@ export class UserSettingsModalComponent implements OnChanges {
 
     this.authService.updateCurrentUser(request).subscribe((user) => {
       this.currentUser = user;
-      this.revokePreviewObjectUrl();
-      this.selectedPictureFile = null;
-      this.previewPictureUrl = this.currentUser?.final_picture ?? null;
+      this.resetPictureSelection();
       this.userUpdated.emit(user);
       this.closed.emit();
     });
@@ -79,41 +68,46 @@ export class UserSettingsModalComponent implements OnChanges {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
 
-    this.revokePreviewObjectUrl();
-
     if (!file) {
-      this.selectedPictureFile = null;
-      this.previewPictureUrl = this.currentUser?.final_picture ?? null;
+      this.resetPictureSelection();
       return;
     }
 
+    this.revokePreviewObjectUrl();
     this.selectedPictureFile = file;
     this.objectUrl = URL.createObjectURL(file);
     this.previewPictureUrl = this.objectUrl;
   }
 
-  private buildSettingsPayload(): Partial<User> {
-    const payload: Partial<User> = {
+  private resolveSettingsFields(): { name: string; email: string; status: User['status']; password: string | null } {
+    return {
       name: this.settingsForm.name.trim() || this.currentUser?.name || '',
+      email: this.settingsForm.email.trim() || this.currentUser?.email || '',
       status: this.settingsForm.status,
-      email: this.settingsForm.email.trim() || this.currentUser?.email || ''
+      password: this.settingsForm.password.trim() || null
     };
+  }
 
-    if (this.settingsForm.password.trim()) {
-      payload.password = this.settingsForm.password.trim();
+  private buildSettingsPayload(): Partial<User> {
+    const { name, email, status, password } = this.resolveSettingsFields();
+    const payload: Partial<User> = { name, email, status };
+
+    if (password) {
+      payload.password = password;
     }
 
     return payload;
   }
 
   private buildSettingsFormData(): FormData {
+    const { name, email, status, password } = this.resolveSettingsFields();
     const formData = new FormData();
-    formData.append('name', this.settingsForm.name.trim() || this.currentUser?.name || '');
-    formData.append('status', this.settingsForm.status);
-    formData.append('email', this.settingsForm.email.trim() || this.currentUser?.email || '');
+    formData.append('name', name);
+    formData.append('status', status);
+    formData.append('email', email);
 
-    if (this.settingsForm.password.trim()) {
-      formData.append('password', this.settingsForm.password.trim());
+    if (password) {
+      formData.append('password', password);
     }
 
     if (this.selectedPictureFile) {
@@ -124,15 +118,22 @@ export class UserSettingsModalComponent implements OnChanges {
   }
 
   private resetSettingsForm(): void {
-    this.settingsForm = {
-      name: this.currentUser?.name ?? '',
-      email: this.currentUser?.email ?? '',
-      password: this.currentUser?.password ?? '',
-      picture: this.currentUser?.picture ?? '',
-      status: this.currentUser?.status ?? 'online'
+    this.settingsForm = this.toSettingsForm(this.currentUser);
+    this.resetPictureSelection();
+  }
+
+  private toSettingsForm(user: User | null): SettingsForm {
+    return {
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      password: user?.password ?? '',
+      status: user?.status ?? 'online'
     };
-    this.selectedPictureFile = null;
+  }
+
+  private resetPictureSelection(): void {
     this.revokePreviewObjectUrl();
+    this.selectedPictureFile = null;
     this.previewPictureUrl = this.currentUser?.final_picture ?? null;
   }
 
